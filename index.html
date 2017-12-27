@@ -1,0 +1,218 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no">
+	<link rel="shortcut icon" type="image/x-icon" href="images/title.ico"/>
+	<title>Collescape</title>
+	<link rel="stylesheet" href="css/style.css" type="text/css">
+	<script type="text/javascript" src="script.js"></script>
+</head>
+<body>
+<audio id="collisionSound" preload>
+    <source src="audio/collision.mp3" />
+</audio>
+<audio id="backgroundSound" loop="loop" preload>
+    <source src="audio/background.mp3" />
+</audio>
+<audio id="wallSound" preload>
+    <source src="audio/wallHit.mp3" />
+</audio>
+<audio id="shootSound" preload>
+    <source src="audio/shoot.mp3" />
+</audio>
+<audio id="powerSound" preload>
+    <source src="audio/power.mp3" />
+</audio>
+<audio id="dangerSound" preload>
+    <source src="audio/danger.mp3" />
+</audio>
+<img src="images/boom.jpg" id="boom" height="30" width="90" align="right" style="display:none"/>
+<img src="images/danger.png" id="danger" height="50" width="50" align="right" style="display:none"/>
+<img src="images/life.png" id="life" height="50" width="50" align="right" style="display:none"/>
+<img src="images/moneyBag.png" id="money" height="50" width="50" align="right" style="display:none"/>
+	<div id="background">
+		<div id="header">
+			<div>
+				<div>
+					<a href="index.html" class="logo"><img src="images/logo.png" alt=""></a>
+					<ul>
+						<li class="selected">
+							<a href="index.html" id="menu1">home</a>
+						</li>
+						<li>
+							<a id="menu2" onclick="reloadGame()">restart</a>
+						</li>
+						<li>
+							<a id="menu3" onclick="startGame()">start</a>
+						</li>
+						<li>
+							<a href="about.html" id="menu4">help</a>
+						</li>
+						<li>
+							<a id="menu5" onclick="">champions</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div id="body">
+			<div>
+				<div>
+					<div class="featured">
+						<div id="notification" align="center">
+							<b>Welcome to Collescape! Start your game!!</b>
+						</div>
+						<canvas id="myCanvas" width="1200" align="center" height="700" onclick="shoot();" style="background-image: url('images/pattern5.jpg');border:10px ridge #d3d3d3;">
+							Your browser does not support the HTML5 canvas tag.
+						</canvas>
+					</div>
+
+					<div class="section">
+						
+						<img src="images/mute.jpg" id="muteUnmute" height="30" width="30" align="right" title="music off" onclick="muteUnmuteClicked()" />
+						
+						<div>
+							<div id="attempts">Shoots Remaining: 5</div>
+							<div id="scoreUpdate">Present Shoot Score: 0 $</div>
+							<div id="highestScore">High Score: 0 $</div>
+						</div>
+						<div>
+							<h3>Shoot Scores List: </h3>
+							<div id="scoresList"></div>
+						</div>
+						<div>
+							<h3>Best Five: </h3>
+							<div id="bestFiveList"></div>
+						</div>
+						<div>
+							<h3>Total Score: </h3>
+							<div id="totalScore"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="footer">
+			<div>
+				<ul>
+					<li id="facebook">
+						<a href="https://www.facebook.com/sumanthkrvb">facebook</a>
+					</li>
+					<li id="twitter">
+						<a href="">twitter</a>
+					</li>
+					<li id="googleplus">
+						<a href="">googleplus</a>
+					</li>
+				</ul>
+				<p>
+					@ copyright 2013. all rights reserved.
+				</p>
+			</div>
+		</div>
+	</div>
+	<script>
+
+		var jumpx = Math.ceil(Math.random()*3);
+		var jumpy = Math.ceil(Math.random()*3);
+		if(jumpx * jumpy == 1)
+		{
+			jumpx++;
+		}
+		if(jumpx2 * jumpy2 == 1)
+		{
+			jumpy2++;
+		}
+
+		var jumpx2 = Math.ceil(Math.random()*3);
+		var jumpy2 = Math.ceil(Math.random()*3);
+		var stepx=Number(jumpx);
+		var stepy=Number(jumpy);
+		var stepx2=jumpx2;
+		var stepy2=jumpy2;
+		var jumpx3 = Math.ceil(Math.random()*3);
+		var jumpy3 = Math.ceil(Math.random()*3);
+		var stepx3=jumpx3;
+		var stepy3=jumpy3;
+
+		score=0;
+		attempts=5;
+		collision=false;
+		isMute=false;
+		deadline=10;
+		dangerPeriod=5;
+		x1=0;
+		y1=0;
+		x2=10000;
+		y2=10000;
+		x3=0;
+		y3=0;
+		var presentShoot;
+		var masterShoot; 
+		var dangerShoot;
+
+		var c=document.getElementById("myCanvas");
+		var ctx1=c.getContext("2d");
+		var ctx2=c.getContext("2d");
+		var ctx3=c.getContext("2d");
+		var scoreArray = new Array();
+		scoreArray[0] = 0;
+		var scoreArrayIndex = 0;
+		var isStarted = false;
+		var danger = false;
+		var randomDanger = Math.ceil(500+1000*Math.random());
+		var dangerImage = false;
+		var dangerx;
+		var dangery;
+		var dangerDelay = 10;
+
+		var randomLife = Math.ceil(1000+500*Math.random());
+		var lifeImage = false;
+		var lifex;
+		var lifey;
+		var life = false;
+
+		var randomMoney = Math.ceil(1000+500*Math.random());
+		var moneyImage = false;
+		var moneyy;
+		var moneyx;
+		var money = false;
+
+		var fired = 0;
+		var scoreLeap = 1;
+		//c.width=prompt("Arena width","1200");
+		//c.height=prompt("Arena height","730");
+		//radius=Number(prompt("Object radius","60"));
+		/*if(screen.width < c.width)
+		{
+			c.width=(90/100)*screen.width;
+		}
+		if(screen.height < c.height)
+		{
+			c.height=(90/100)*screen.height;
+		}*/
+		radius=50;
+		delay=10;
+		//delay=Number(prompt("Object delay","10"));
+		//document.getElementById("notification").innerHTML = "Please Start the game by clicking on start button.";
+		writeCanvas(0.3,"Start your game!!");
+		document.getElementById("backgroundSound").play();
+		document.getElementById("highestScore").innerHTML = "High Score: "+localStorage.highScore+" $ by "+localStorage.highScorerName; 
+
+		limitx=c.width-2*radius;
+		limity=c.height-2*radius;
+		 c.addEventListener('click', function(evt) {
+			 	if(attempts>0 && isStarted)
+			 	{
+			        var mousePos = getMousePos(c, evt);
+			        x2= Number(mousePos.x);
+			        y2=Number(mousePos.y);
+					attempts--;
+					scoreLeap = 1;
+			 	}
+		     }, false);
+
+	</script>
+</body>
+</html>
